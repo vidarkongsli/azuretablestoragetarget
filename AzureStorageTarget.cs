@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Data.Services.Client;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.ServiceRuntime;
@@ -31,28 +30,24 @@ namespace Demo.NLog.Azure
 
         protected override void Write(LogEventInfo loggingEvent)
         {
-            Action doWriteToLog = () =>
+            try
             {
-                try
+                _ctx.Log(new LogEntry
                 {
-                    _ctx.Log(new LogEntry
-                    {
-                        RoleInstance = RoleEnvironment.CurrentRoleInstance.Id,
-                        DeploymentId = RoleEnvironment.DeploymentId,
-                        Timestamp = loggingEvent.TimeStamp,
-                        Message = loggingEvent.FormattedMessage,
-                        Level = loggingEvent.Level.Name,
-                        LoggerName = loggingEvent.LoggerName,
-                        StackTrace = loggingEvent.StackTrace != null ? loggingEvent.StackTrace.ToString() : null
-                    });
-                }
-                catch (DataServiceRequestException e)
-                {
-                    InternalLogger.Error(string.Format("{0}: Could not write log entry to {1}: {2}",
-                        GetType().AssemblyQualifiedName, _tableEndpoint, e.Message), e);
-                }
-            };
-            doWriteToLog.BeginInvoke(null, null);
+                    RoleInstance = RoleEnvironment.CurrentRoleInstance.Id,
+                    DeploymentId = RoleEnvironment.DeploymentId,
+                    Timestamp = loggingEvent.TimeStamp,
+                    Message = loggingEvent.FormattedMessage,
+                    Level = loggingEvent.Level.Name,
+                    LoggerName = loggingEvent.LoggerName,
+                    StackTrace = loggingEvent.StackTrace != null ? loggingEvent.StackTrace.ToString() : null
+                });
+            }
+            catch (DataServiceRequestException e)
+            {
+                InternalLogger.Error(string.Format("{0}: Could not write log entry to {1}: {2}",
+                    GetType().AssemblyQualifiedName, _tableEndpoint, e.Message), e);
+            }
         }
     }
 }

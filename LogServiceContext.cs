@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Data.Services.Client;
+using System.Linq;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
 
@@ -10,7 +11,7 @@ namespace Demo.NLog.Azure
         internal void Log(LogEntry logEntry)
         {
             AddObject("LogEntries", logEntry);
-            SaveChanges();
+            BeginSaveChanges(SaveChangesOptions.Batch, null, null);
         }
 
         public IQueryable<LogEntry> LogEntries
